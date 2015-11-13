@@ -16,8 +16,10 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
+import Son.Audio;
 import animation.AnimationPerso;
 import animation.OutilsAnimation;
+
 
 public class Maze1 extends BasicGameState {
 
@@ -28,7 +30,7 @@ public class Maze1 extends BasicGameState {
 	private Animation[] animations = new Animation[8];
 	private List<Piece> pieces;
 	private int[][] matrice;
-	private long chrono = 0,chrono2  ;
+	private long chrono = 0,chrono2;
     private int tempsEcoule = 150,ancienneDuree;
     
 	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso, int[][] matrice) throws SlickException {
@@ -42,10 +44,12 @@ public class Maze1 extends BasicGameState {
 	@Override
 	public void init(GameContainer arg0, StateBasedGame game) throws SlickException {
 		// on adapte la taille de la fenetre à la taille de la map
-		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight(),false);
+	    StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight(),false);
 		this.animations=AnimationPerso.getInstance();
 		remplirLabyrinthe();
 		chrono = java.lang.System.currentTimeMillis() ;
+		Audio a = Audio.getSon("Sons/24118.wav");
+		a.play();
 	}
 
 	
