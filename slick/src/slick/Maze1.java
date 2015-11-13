@@ -27,14 +27,15 @@ public class Maze1 extends BasicGameState {
 	private boolean moving = false;
 	private Animation[] animations = new Animation[8];
 	private List<Piece> pieces;
+	private int[][] matrice;
 	private long chrono = 0,chrono2  ;
     private int tempsEcoule = 150,ancienneDuree;
     
-	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso) throws SlickException {
+	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso, int[][] matrice) throws SlickException {
 		this.map = new TiledMap(cheminCarte);
 		this.xPerso=xTuilePerso*map.getTileWidth();
 		this.yPerso=yTuilePerso*map.getTileHeight();
-		
+		this.matrice = matrice;
 	}
 
 
@@ -134,10 +135,9 @@ public class Maze1 extends BasicGameState {
 	
 	public void remplirLabyrinthe(){
 		pieces = new ArrayList<Piece>();
-		for(int i=1; i<24; i++){
-			for(int j=1; j<23; j++){
-				if(j!=1 && j!=3 && j!=6 && j!=7 && j!=9  && j!=10 && j!=12 && j!=13 && j!=16 && j!=17 && j!=18 && j!=20 && j!=21 && i!=3 && i!=6 && i!=9 && i!=12 && i!=15 && i!=18 && i!=21)
-				pieces.add(new Piece(i*map.getTileWidth(),j*map.getTileHeight()));
+		for(int i=0; i<24; i++){
+			for(int j=0; j<24; j++){
+				if(this.matrice[i][j]==0) pieces.add(new Piece(i*map.getTileWidth(),j*map.getTileHeight()));
 			}
 		}
 		
