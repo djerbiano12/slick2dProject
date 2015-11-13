@@ -1,9 +1,5 @@
 package Son;
 
-import java.applet.Applet;
-import java.applet.AudioClip;
-import java.net.URL;
-
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.SoundStore;
 
@@ -53,22 +49,18 @@ public class Audio extends Thread {
 		sound.playAsSoundEffect(pitch, volume * SoundStore.get().getSoundVolume(), false);
 	}
 	
-	
 	public void loop() {
 		loop(1.0f, 1.0f);
 	}
-	
 	
 	public void loop(float pitch, float volume) {
 		sound.playAsSoundEffect(pitch, volume * SoundStore.get().getSoundVolume(), true);
 	}
 	
-
 	public boolean playing() {
 		return sound.isPlaying();
 	}
-	
-    
+	    
 	public void Stop() {
 		sound.stop();
 	}

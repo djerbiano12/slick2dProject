@@ -31,7 +31,7 @@ public class Maze1 extends BasicGameState {
 	private List<Piece> pieces;
 	private int[][] matrice;
 	private long chrono = 0,chrono2;
-    private int tempsEcoule = 150,ancienneDuree;
+    private int tempsEcoule = 160,ancienneDuree;
     
 	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso, int[][] matrice) throws SlickException {
 		this.map = new TiledMap(cheminCarte);
