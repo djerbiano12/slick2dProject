@@ -20,6 +20,7 @@ public class StateWin extends BasicGameState{
 	@Override
 	public void render(GameContainer arg0, StateBasedGame arg1, Graphics g)
 			throws SlickException {
+		g.setBackground(Color.white);
 		g.setColor(Color.blue);
 		g.drawString("Bravo, vous avez gagné !!!", 250, 250);
 		

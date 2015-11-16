@@ -31,7 +31,8 @@ public class Maze1 extends BasicGameState {
 	private List<Piece> pieces;
 	private int[][] matrice;
 	private long chrono = 0,chrono2;
-    private int tempsEcoule = 160,ancienneDuree;
+    private int tempsEcoule = 180,ancienneDuree;
+    private Audio a;
     
 	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso, int[][] matrice) throws SlickException {
 		this.map = new TiledMap(cheminCarte);
@@ -48,8 +49,8 @@ public class Maze1 extends BasicGameState {
 		this.animations=AnimationPerso.getInstance();
 		remplirLabyrinthe();
 		chrono = java.lang.System.currentTimeMillis() ;
-		Audio a = Audio.getSon("Sons/24118.wav");
-		a.play();
+		a = Audio.getSon("Sons/24118.wav");
+		a.loop();
 	}
 
 	
@@ -70,7 +71,10 @@ public class Maze1 extends BasicGameState {
 			pieces.get(i).dessiner(graphic);
 		}
 		this.ancienneDuree = (int)((chrono2 - chrono)*0.001);
-		if(this.tempsEcoule == 0) game.enterState(States.LOST);
+		if(this.tempsEcoule == 0) {
+			a.Stop();
+			game.enterState(States.LOST);
+			}
 		verifierGain(game);
 	}
 
@@ -92,7 +96,9 @@ public class Maze1 extends BasicGameState {
 	}
 
 	public void verifierGain(StateBasedGame game){
-		if(pieces.size() == 0) game.enterState(States.WIN);
+		if(pieces.size() == 0) {
+			a.Stop();
+			game.enterState(States.WIN);}
 	}
 	
 	private boolean isCollision(float x, float y) {
