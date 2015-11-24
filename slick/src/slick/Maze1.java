@@ -1,7 +1,9 @@
 package slick;
 
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import model.Piece;
 
@@ -29,16 +31,17 @@ public class Maze1 extends BasicGameState {
 	private boolean moving = false;
 	private Animation[] animations = new Animation[8];
 	private List<Piece> pieces;
-	private int[][] matrice;
 	private long chrono = 0,chrono2;
     private int tempsEcoule = 180,ancienneDuree;
     private Audio a;
+    private int nbrPieces = 10;
+	Random rand = new Random();
+
     
-	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso, int[][] matrice) throws SlickException {
+	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso) throws SlickException {
 		this.map = new TiledMap(cheminCarte);
 		this.xPerso=xTuilePerso*map.getTileWidth();
 		this.yPerso=yTuilePerso*map.getTileHeight();
-		this.matrice = matrice;
 	}
 
 
@@ -50,10 +53,9 @@ public class Maze1 extends BasicGameState {
 		remplirLabyrinthe();
 		chrono = java.lang.System.currentTimeMillis() ;
 		a = Audio.getSon("Sons/24118.wav");
-		a.loop();
+		//a.loop();
 	}
 
-	
 
 	@Override
 	public void render(GameContainer arg0, StateBasedGame game, Graphics graphic) throws SlickException {
@@ -116,6 +118,14 @@ public class Maze1 extends BasicGameState {
 		boolean collision = tile != null;
 		return collision;
 	}
+	
+	private boolean detecterMurs(int x, int y){
+		int logicLayer = this.map.getLayerIndex("murs");
+		Image tile1 = null;
+		tile1=this.map.getTileImage(x , y, logicLayer);
+		boolean collision = (tile1 != null); 
+		return collision;
+	}
 
 	private float getFuturX(int delta) {
 		float futurX = this.xPerso;
@@ -145,19 +155,26 @@ public class Maze1 extends BasicGameState {
 	
 	public void remplirLabyrinthe(){
 		pieces = new ArrayList<Piece>();
-		for(int i=0; i<24; i++){
-			for(int j=0; j<24; j++){
-				if(this.matrice[i][j]==0) pieces.add(new Piece(i*map.getTileWidth(),j*map.getTileHeight()));
-			}
-		}
+		int posxAleatoire,posyAleatoire;
+			for(int i=0; i<nbrPieces; i++){
+			
+			/********************************************************************************
+			 * Generer aleatoirement les positions X et Y des boules a manger
+			 * formule utilisee -> int valeur = valeurMin + r.nextInt(valeurMax - valeurMin)
+			 ********************************************************************************/
+		do{
+			posxAleatoire = rand.nextInt(20);
+			posyAleatoire = rand.nextInt(20);
+		}while(detecterMurs(posxAleatoire, posyAleatoire));
+			pieces.add(new Piece(posxAleatoire*map.getTileWidth(),posyAleatoire*map.getTileHeight()));}
 		
-	}
+			System.out.println(" size == "+ pieces.size());
+			}
 	
 	public void detecterCollisionPiece(){
 		for(int i=0; i<pieces.size();i++){
 			if((int)(this.xPerso/map.getTileWidth()) == (int)(this.pieces.get(i).getPositionX()/map.getTileWidth() -1) && (int)(this.yPerso/map.getTileHeight()) == (int)(this.pieces.get(i).getPositionY()/map.getTileHeight() -1))
-				this.pieces.remove(i);
-				
+				this.pieces.remove(i);			
 		}
 	}
 

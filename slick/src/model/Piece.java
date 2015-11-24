@@ -1,8 +1,9 @@
 package model;
 
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 public class Piece {
 	
@@ -35,8 +36,16 @@ public class Piece {
 	}
 
 	public void dessiner(Graphics g){
-		g.setColor(new Color(206,206,206));
-		g.fillOval(this.positionX, this.positionY, 10, 10);	
+		try {
+			g.drawImage(loadImage("ressources/piece.png"), this.positionX, this.positionY);
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Image loadImage(String path) throws SlickException{
+		return new Image(path,false,Image.FILTER_NEAREST);
+		
 	}
 
 }

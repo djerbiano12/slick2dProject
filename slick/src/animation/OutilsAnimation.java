@@ -18,10 +18,12 @@ public final class OutilsAnimation {
 	public static Animation[] initAnimation(int n, String fichier, int tuile_w, int tuile_h) throws SlickException {
 		Animation[] animations = new Animation[n];
 		SpriteSheet spriteSheet = new SpriteSheet("map/tuiles/perso.png",tuile_w,tuile_h);
+		// sans mouvement
 		animations[0] = loadAnimation(spriteSheet, 0, 1, 0);
 		animations[1] = loadAnimation(spriteSheet, 0, 1, 1);
 		animations[2] = loadAnimation(spriteSheet, 0, 1, 2);
 		animations[3] = loadAnimation(spriteSheet, 0, 1, 3);
+		// animations
 		animations[4] = loadAnimation(spriteSheet, 1, 9, 0);
 		animations[5] = loadAnimation(spriteSheet, 1, 9, 1);
 		animations[6] = loadAnimation(spriteSheet, 1, 9, 2);
