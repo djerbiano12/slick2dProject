@@ -2,50 +2,18 @@ package model;
 
 
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
 
-public class Piece {
-	
-	private int positionX,positionY;
-	
-	public Piece() {
-		// TODO Auto-generated constructor stub
-	}
+public class Piece extends ElementJeuStatique{
 
- 	public Piece(int positionX, int positionY) {
-		super();
-		this.positionX = positionX;
-		this.positionY = positionY;
+	public Piece(int positionX, int positionY) {
+		super(positionX, positionY,32,32, "ressources/piece.png");
 	}
- 	
-	public float getPositionX() {
-		return positionX;
-	}
-
-	public void setPositionX(int positionX) {
-		this.positionX = positionX;
-	}
-
-	public float getPositionY() {
-		return positionY;
-	}
-
-	public void setPositionY(int positionY) {
-		this.positionY = positionY;
-	}
-
+	//////////////////////////
+	/// Mettre dans la vue 
+	/////////////////////////
 	public void dessiner(Graphics g){
-		try {
-			g.drawImage(loadImage("ressources/piece.png"), this.positionX, this.positionY);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+	g.drawImage(image, this.positionX, this.positionY);
 	}
-	
-	public Image loadImage(String path) throws SlickException{
-		return new Image(path,false,Image.FILTER_NEAREST);
-		
-	}
+
 
 }

@@ -1,10 +1,10 @@
 package slick;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import model.Personnage;
 import model.Piece;
 
 import org.newdawn.slick.Animation;
@@ -22,159 +22,153 @@ import Son.Audio;
 import animation.AnimationPerso;
 import animation.OutilsAnimation;
 
-
 public class Maze1 extends BasicGameState {
 
+	private final int NBR_PIECE = 10;
+	private final int TEMPS_JEU = 180; // en secondes
+	public static final String COUCHE_LOGIQUE = "murs";	// nom de la couche qui contient les murs de la carte
+	private final int EPSILON = 100; // tolerance pour la collision pièce - perso
+	
 	private TiledMap map;
-	private float xPerso, yPerso;
-	private int direction = OutilsAnimation.BAS;
-	private boolean moving = false;
-	private Animation[] animations = new Animation[8];
+	Personnage perso;
+	
 	private List<Piece> pieces;
-	private long chrono = 0,chrono2;
-    private int tempsEcoule = 180,ancienneDuree;
-    private Audio a;
-    private int nbrPieces = 10;
+	private long chrono = 0, chrono2;
+	private int tempsEcoule, ancienneDuree;
+	private Audio a;
 	Random rand = new Random();
+	
 
-    
-	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso) throws SlickException {
+	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso)
+			throws SlickException {
 		this.map = new TiledMap(cheminCarte);
-		this.xPerso=xTuilePerso*map.getTileWidth();
-		this.yPerso=yTuilePerso*map.getTileHeight();
+		int xPerso = xTuilePerso * map.getTileWidth();
+		int yPerso = yTuilePerso * map.getTileHeight();
+		this.perso=new Personnage(xPerso, yPerso);
+		
 	}
 
-
 	@Override
-	public void init(GameContainer arg0, StateBasedGame game) throws SlickException {
+	public void init(GameContainer arg0, StateBasedGame game)
+			throws SlickException {
 		// on adapte la taille de la fenetre à la taille de la map
-	    StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight(),false);
-		this.animations=AnimationPerso.getInstance();
+		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),
+				map.getHeight() * map.getTileHeight(), false);
 		remplirLabyrinthe();
-		chrono = java.lang.System.currentTimeMillis() ;
+		chrono = java.lang.System.currentTimeMillis();
+		this.tempsEcoule=TEMPS_JEU;
 		a = Audio.getSon("Sons/24118.wav");
 		a.loop();
 	}
 
-
 	@Override
-	public void render(GameContainer arg0, StateBasedGame game, Graphics graphic) throws SlickException {
+	public void render(GameContainer arg0, StateBasedGame game, Graphics graphic)
+			throws SlickException {
 		this.map.render(0, 0);
-		graphic.setColor(Color.white);
-		chrono2 = java.lang.System.currentTimeMillis() ;
-		int duree = (int)((chrono2 - chrono)*0.001) - this.ancienneDuree;
-		this.tempsEcoule = this.tempsEcoule - duree;
-		graphic.drawString("Time = "+this.tempsEcoule, 30, 40);
+		
 		graphic.setColor(new Color(0, 0, 0, .5f));
-		graphic.fillOval(xPerso + 16, yPerso + 52, 32, 16);
-		graphic.drawAnimation(animations[direction + (moving ? 4 : 0)], xPerso, yPerso);
-		detecterCollisionPiece();
-		for(int i=0; i<pieces.size();i++){
+		graphic.fillOval(perso.getX() + 16, perso.getY() + 52, 32, 16);
+		graphic.drawAnimation(perso.getAnimations()[perso.getDirection() + (perso.isMoving() ? 4 : 0)], perso.getX(),
+				perso.getY());
+		graphic.drawRect(perso.getX(),perso.getY(), 64, 64);
+		
+		CollisionPiecePerso();
+		for (int i = 0; i < pieces.size(); i++) {
 			pieces.get(i).dessiner(graphic);
+			
+			//////////////////////////////////////
+			///   Marquage de debug
+			//////////////////////////////////////
+			graphic.setColor(Color.red);
+			graphic.fillOval(pieces.get(i).getX() , pieces.get(i).getY() , 7, 7);
+			graphic.setColor(Color.black);
+			graphic.drawRect(pieces.get(i).getX(), pieces.get(i).getY(), 32, 32);
 		}
-		this.ancienneDuree = (int)((chrono2 - chrono)*0.001);
-		if(this.tempsEcoule == 0) {
+		
+		
+		
+		graphic.setColor(Color.white);
+		chrono2 = java.lang.System.currentTimeMillis();
+		int duree = (int) ((chrono2 - chrono) * 0.001) - this.ancienneDuree;
+		this.tempsEcoule = this.tempsEcoule - duree;
+		graphic.drawString("Time = " + this.tempsEcoule, 30, 40);
+		this.ancienneDuree = (int) ((chrono2 - chrono) * 0.001);
+		if (this.tempsEcoule == 0) {
 			a.Stop();
 			game.enterState(States.LOST);
-			}
+		}
 		verifierGain(game);
+		
+		
+		
+		//////////////////////////////////////
+		///   Marquage de debug
+		//////////////////////////////////////
+		graphic.setColor(Color.red);
+		graphic.fillOval(perso.getX(), perso.getY() , 7, 7);
+		graphic.setColor(Color.black);
+		graphic.drawRect(perso.getX(), perso.getY(), 64, 64);
+		
 	}
 
 	@Override
-	public void update(GameContainer arg0, StateBasedGame game, int delta) throws SlickException {
-		if (this.moving) {
+	public void update(GameContainer arg0, StateBasedGame game, int delta)
+			throws SlickException {
 			// on commence par calculer les coordonnees du prochain point
-	        float futurX = getFuturX(delta);
-	        float futurY = getFuturY(delta);
-	        // puis on regarde s'il y a une collision avec un mur
-	        boolean collision = isCollision(futurX, futurY);
-	        if (collision) {
-	            this.moving = false;
-	        } else {
-	            this.xPerso = futurX;
-	            this.yPerso = futurY;
-	        }
-	    }
+		this.perso.update(delta, map);
+		
 	}
 
-	public void verifierGain(StateBasedGame game){
-		if(pieces.size() == 0) {
+	public void verifierGain(StateBasedGame game) {
+		if (pieces.size() == 0) {
 			a.Stop();
-			game.enterState(States.WIN);}
-	}
-	
-	private boolean isCollision(float x, float y) {
-		int tileW = this.map.getTileWidth();
-		int tileH = this.map.getTileHeight();
-		int logicLayer = this.map.getLayerIndex("murs");
-		Image tile = null;
-		switch (this.direction){
-			case OutilsAnimation.HAUT:tile=this.map.getTileImage((int) (x+tileW*1) / tileW, (int) (y+tileH) / tileH, logicLayer);break;
-			case OutilsAnimation.BAS:tile=this.map.getTileImage((int) (x+tileW*1) / tileW, (int) (y+tileH*2) / tileH, logicLayer);break;
-			case OutilsAnimation.GAUCHE:tile=this.map.getTileImage((int) (x+tileW*0.5) / tileW, (int) (y+tileH*1.5) / tileH, logicLayer);break;
-			case OutilsAnimation.DROITE:tile=this.map.getTileImage((int) (x+tileW*1.5) / tileW, (int) (y+tileH*1.5) / tileH, logicLayer);break;
+			game.enterState(States.WIN);
 		}
-		
-		boolean collision = tile != null;
-		return collision;
 	}
+
 	
-	private boolean detecterMurs(int x, int y){
+
+	private boolean detecterMurs(int x, int y) {
 		int logicLayer = this.map.getLayerIndex("murs");
 		Image tile1 = null;
-		tile1=this.map.getTileImage(x , y, logicLayer);
-		boolean collision = (tile1 != null); 
-		return collision;
+		tile1 = this.map.getTileImage(x, y, logicLayer);
+		return (tile1 != null);
+
 	}
 
-	private float getFuturX(int delta) {
-		float futurX = this.xPerso;
-		switch (this.direction) {
-		case OutilsAnimation.GAUCHE:
-			futurX = this.xPerso - .1f * delta;
-			break;
-		case OutilsAnimation.DROITE:
-			futurX = this.xPerso + .1f * delta;
-			break;
-		}
-		return futurX;
-	}
 
-	private float getFuturY(int delta) {
-		float futurY = this.yPerso;
-		switch (this.direction) {
-		case OutilsAnimation.HAUT:
-			futurY = this.yPerso - .1f * delta;
-			break;
-		case OutilsAnimation.BAS:
-			futurY = this.yPerso + .1f * delta;
-			break;
-		}
-		return futurY;
-	}
-	
-	public void remplirLabyrinthe(){
+	public void remplirLabyrinthe() {
 		pieces = new ArrayList<Piece>();
-		int posxAleatoire,posyAleatoire;
-			for(int i=0; i<nbrPieces; i++){
-			
+		int posxAleatoire, posyAleatoire;
+		int tileW = map.getTileWidth(); // largeur d'une tuile 
+		int tileH = map.getTileHeight();// hauteur d'une tuile
+		for (int i = 0; i < NBR_PIECE; i++) {
+
 			/********************************************************************************
 			 * Generer aleatoirement les positions X et Y des boules a manger
-			 * formule utilisee -> int valeur = valeurMin + r.nextInt(valeurMax - valeurMin)
+			 * formule utilisee -> int valeur = valeurMin + r.nextInt(valeurMax
+			 * - valeurMin)
 			 ********************************************************************************/
-		do{
-			posxAleatoire = rand.nextInt(20);
-			posyAleatoire = rand.nextInt(20);
-		}while(detecterMurs(posxAleatoire, posyAleatoire));
-			pieces.add(new Piece(posxAleatoire*map.getTileWidth(),posyAleatoire*map.getTileHeight()));}
-		
-			System.out.println(" size == "+ pieces.size());
-			}
-	
-	public void detecterCollisionPiece(){
-		for(int i=0; i<pieces.size();i++){
-			if((int)(this.xPerso/map.getTileWidth()) == (int)(this.pieces.get(i).getPositionX()/map.getTileWidth() -1) && (int)(this.yPerso/map.getTileHeight()) == (int)(this.pieces.get(i).getPositionY()/map.getTileHeight() -1))
-				this.pieces.remove(i);			
+			do {
+				posxAleatoire = 1+rand.nextInt(this.map.getWidth()-3);
+				posyAleatoire = 1+rand.nextInt(this.map.getWidth()-3);
+			} while (detecterMurs(posxAleatoire, posyAleatoire));
+			pieces.add(new Piece(posxAleatoire*tileW, posyAleatoire*tileH));
+		}
+
+	}
+
+	public void CollisionPiecePerso() {
+		// Pour détecter une collision entre le perso et une pièce, on considère le centre des deux images
+		for (int i = 0; i < pieces.size(); i++) {
+			Piece piece = this.pieces.get(i);
+			int xPiece = piece.getX()+piece.getWidth()/2;
+			int yPiece = piece.getY()+piece.getHeight()/2;
+			int xPerso = (int)perso.getX() / map.getTileWidth()+perso.getWidth()/2;
+			int yPerso = (int)perso.getY() / map.getTileHeight()+perso.getHeight()/2;
+			// on regarde s'ils sont proche avec une tolérance epsilon
+			if (Math.abs(xPerso - xPiece)<EPSILON && Math.abs(yPerso - yPiece)<EPSILON)
+				this.pieces.remove(i);
 		}
 	}
 
@@ -186,28 +180,17 @@ public class Maze1 extends BasicGameState {
 	@Override
 	public void keyPressed(int key, char c) {
 		switch (key) {
-		case Input.KEY_UP:
-			this.direction = OutilsAnimation.HAUT;
-			this.moving = true;
-			break;
-		case Input.KEY_LEFT:
-			this.direction = OutilsAnimation.GAUCHE;
-			this.moving = true;
-			break;
-		case Input.KEY_DOWN:
-			this.direction = OutilsAnimation.BAS;
-			this.moving = true;
-			break;
-		case Input.KEY_RIGHT:
-			this.direction = OutilsAnimation.DROITE;
-			this.moving = true;
-			break;
+		case Input.KEY_UP: perso.setDirection( OutilsAnimation.HAUT ) ;break;
+		case Input.KEY_LEFT: perso.setDirection(  OutilsAnimation.GAUCHE);break;
+		case Input.KEY_DOWN: perso.setDirection( OutilsAnimation.BAS); break;
+		case Input.KEY_RIGHT: perso.setDirection(  OutilsAnimation.DROITE); break;
 		}
+		perso.setMoving(true);
 	}
 
 	@Override
 	public void keyReleased(int key, char c) {
-		this.moving = false;
+		perso.setMoving(false);
 	}
 
 }
