@@ -7,13 +7,13 @@ import org.newdawn.slick.SlickException;
 
 public class Piece {
 	
-	private float positionX,positionY;
+	private int positionX,positionY;
 	
 	public Piece() {
 		// TODO Auto-generated constructor stub
 	}
 
- 	public Piece(float positionX, float positionY) {
+ 	public Piece(int positionX, int positionY) {
 		super();
 		this.positionX = positionX;
 		this.positionY = positionY;
@@ -23,7 +23,7 @@ public class Piece {
 		return positionX;
 	}
 
-	public void setPositionX(float positionX) {
+	public void setPositionX(int positionX) {
 		this.positionX = positionX;
 	}
 
@@ -31,7 +31,7 @@ public class Piece {
 		return positionY;
 	}
 
-	public void setPositionY(float positionY) {
+	public void setPositionY(int positionY) {
 		this.positionY = positionY;
 	}
 

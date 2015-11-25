@@ -53,7 +53,7 @@ public class Maze1 extends BasicGameState {
 		remplirLabyrinthe();
 		chrono = java.lang.System.currentTimeMillis() ;
 		a = Audio.getSon("Sons/24118.wav");
-		//a.loop();
+		a.loop();
 	}
 
 
