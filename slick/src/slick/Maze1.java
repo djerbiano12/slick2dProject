@@ -27,7 +27,7 @@ public class Maze1 extends BasicGameState {
 	private final int NBR_PIECE = 10;
 	private final int TEMPS_JEU = 180; // en secondes
 	public static final String COUCHE_LOGIQUE = "murs";	// nom de la couche qui contient les murs de la carte
-	private final int EPSILON = 100; // tolerance pour la collision pièce - perso
+	private final int EPSILON = 40; // tolerance pour la collision pièce - perso
 	
 	private TiledMap map;
 	Personnage perso;
@@ -164,8 +164,8 @@ public class Maze1 extends BasicGameState {
 			Piece piece = this.pieces.get(i);
 			int xPiece = piece.getX()+piece.getWidth()/2;
 			int yPiece = piece.getY()+piece.getHeight()/2;
-			int xPerso = (int)perso.getX() / map.getTileWidth()+perso.getWidth()/2;
-			int yPerso = (int)perso.getY() / map.getTileHeight()+perso.getHeight()/2;
+			int xPerso = (int)perso.getX() +perso.getWidth()/2;
+			int yPerso = (int)perso.getY() +perso.getHeight()/2;
 			// on regarde s'ils sont proche avec une tolérance epsilon
 			if (Math.abs(xPerso - xPiece)<EPSILON && Math.abs(yPerso - yPiece)<EPSILON)
 				this.pieces.remove(i);
