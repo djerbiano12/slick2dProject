@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="1">
  <tileset firstgid="1" name="forest_tiles" tilewidth="32" tileheight="32" tilecount="256">
   <image source="tuiles/forest_tiles.png" width="512" height="512"/>
  </tileset>
  <tileset firstgid="257" name="walls_x" tilewidth="32" tileheight="32" tilecount="15">
   <image source="tuiles/walls_x.png" width="480" height="32"/>
  </tileset>
- <layer name="fond" width="25" height="25">
+ <tileset firstgid="272" name="perso" tilewidth="32" tileheight="32" tilecount="144">
+  <image source="tuiles/perso.png" width="576" height="256"/>
+ </tileset>
+ <layer name="fond" width="20" height="20">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3DAQkAAAwEofv+pZdjoOCqqar66gEA314jxAkAAA==
+   H4sIAAAAAAAAC5NgYGCQGMWjeBSP4lE8iknEAMgutfBABgAA
   </data>
  </layer>
- <layer name="murs" width="25" height="25">
+ <layer name="murs" width="20" height="20">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC8WUSwrAMAhEPYj3P2f3QpyPqRkI2DDtM0abEZELCykPMaMXjNP5uhjVRvkWimvuDKN75xUD1bM+o/pOGIycs24xlDl1e1qR02PbDGVu1X0mF+Tp/NuM6kN9MZ3Bm/+Y6X06DEVu724wmFqpHjX3muNN35Tx9/oAaTqiS8QJAAA=
+   H4sIAAAAAAAAC+NmZGBgQsKsaHxSMBcQMwIxMkDnkwIYh4F53ATCi5B52OwkVm6gzeNG8yM289iICBNc9hPjPkL+GzVvaJvHgZZ+0OU4GXGrZSEiPZMCiMkf5JhJTbPQw4ASDApbANFUw8xABgAA
   </data>
  </layer>
- <layer name="porte" width="25" height="25">
+ <layer name="porte" width="20" height="20" visible="0">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC2NgGAWjYBSMglEwCkbBKBgZQGaY2AECAMB3yjnECQAA
+   H4sIAAAAAAAAC2NgGAWjYBSMglEw2AAj40C7gDAAAHi30iVABgAA
+  </data>
+ </layer>
+ <layer name="perso" width="20" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgGAWjYBSMglEwCkgHADV9EcVABgAA
   </data>
  </layer>
 </map>

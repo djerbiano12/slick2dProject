@@ -24,18 +24,20 @@ import animation.OutilsAnimation;
 
 public class Maze1 extends BasicGameState {
 
-	private final int NBR_PIECE = 10;
-	private final int TEMPS_JEU = 180; // en secondes
+	private final int NBR_PIECE = 1;
+	private final int TEMPS_JEU = 90; // en secondes
 	public static final String COUCHE_LOGIQUE = "murs";	// nom de la couche qui contient les murs de la carte
 	private final int EPSILON = 40; // tolerance pour la collision pièce - perso
-	
+	public static final String URL = "map/maze";
+	public static final int NOMBRE_DE_NIVEAUX = 2;
+	public static final String SON_FILE = "Sons/24118.wav";
 	private TiledMap map;
 	Personnage perso;
-	
 	private List<Piece> pieces;
 	private long chrono = 0, chrono2;
 	private int tempsEcoule, ancienneDuree;
-	private Audio a;
+	private Audio audio;
+	public int niveauActuel;
 	Random rand = new Random();
 	
 
@@ -44,8 +46,7 @@ public class Maze1 extends BasicGameState {
 		this.map = new TiledMap(cheminCarte);
 		int xPerso = xTuilePerso * map.getTileWidth();
 		int yPerso = yTuilePerso * map.getTileHeight();
-		this.perso=new Personnage(xPerso, yPerso);
-		
+		this.perso=new Personnage(xPerso, yPerso);	
 	}
 
 	@Override
@@ -54,11 +55,12 @@ public class Maze1 extends BasicGameState {
 		// on adapte la taille de la fenetre à la taille de la map
 		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),
 				map.getHeight() * map.getTileHeight(), false);
+		this.niveauActuel = 1;
 		remplirLabyrinthe();
 		chrono = java.lang.System.currentTimeMillis();
 		this.tempsEcoule=TEMPS_JEU;
-		a = Audio.getSon("Sons/24118.wav");
-		a.loop();
+		audio = Audio.getSon(SON_FILE);
+		audio.loop();
 	}
 
 	@Override
@@ -94,13 +96,10 @@ public class Maze1 extends BasicGameState {
 		graphic.drawString("Time = " + this.tempsEcoule, 30, 40);
 		this.ancienneDuree = (int) ((chrono2 - chrono) * 0.001);
 		if (this.tempsEcoule == 0) {
-			a.Stop();
+			audio.Stop();
 			game.enterState(States.LOST);
 		}
-		verifierGain(game);
-		
-		
-		
+		verifierGain(game);	
 		//////////////////////////////////////
 		///   Marquage de debug
 		//////////////////////////////////////
@@ -121,12 +120,19 @@ public class Maze1 extends BasicGameState {
 
 	public void verifierGain(StateBasedGame game) {
 		if (pieces.size() == 0) {
-			a.Stop();
-			game.enterState(States.WIN);
+			audio.Stop();
+			if(this.niveauActuel == NOMBRE_DE_NIVEAUX) game.enterState(States.WIN);
+			else{
+				try {
+				audio.loop();
+				passerNiveau(trouverNiveau(this.niveauActuel), 10, 1);
+			} catch (SlickException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				}
 		}
 	}
-
-	
 
 	private boolean detecterMurs(int x, int y) {
 		int logicLayer = this.map.getLayerIndex("murs");
@@ -136,7 +142,10 @@ public class Maze1 extends BasicGameState {
 
 	}
 
-
+  public String trouverNiveau(int niveauActuel){
+	  niveauActuel++;
+	  return URL+niveauActuel+".tmx";
+  }
 	public void remplirLabyrinthe() {
 		pieces = new ArrayList<Piece>();
 		int posxAleatoire, posyAleatoire;
@@ -170,6 +179,16 @@ public class Maze1 extends BasicGameState {
 			if (Math.abs(xPerso - xPiece)<EPSILON && Math.abs(yPerso - yPiece)<EPSILON)
 				this.pieces.remove(i);
 		}
+	}
+	
+	public void passerNiveau(String cheminCarte,int X, int Y) throws SlickException{
+		this.map = new TiledMap(cheminCarte);
+		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),map.getHeight() * map.getTileHeight(), false);
+		this.perso.setX(X * map.getTileWidth());
+		this.perso.setY(Y * map.getTileHeight());
+		remplirLabyrinthe();
+		this.tempsEcoule = TEMPS_JEU;
+		this.niveauActuel ++;
 	}
 
 	@Override

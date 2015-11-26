@@ -22,7 +22,7 @@ public class StateWin extends BasicGameState{
 			throws SlickException {
 		g.setBackground(Color.white);
 		g.setColor(Color.blue);
-		g.drawString("Bravo, vous avez gagné !!!", 250, 250);
+		g.drawString("Jeux Fini !!!", 250, 250);
 		
 	}
 
