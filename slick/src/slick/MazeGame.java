@@ -19,12 +19,11 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
 import Son.Audio;
-import animation.AnimationPerso;
 import animation.OutilsAnimation;
 
-public class Maze1 extends BasicGameState {
+public class MazeGame extends BasicGameState {
 
-	private final int NBR_PIECE = 1;
+	private final int NBR_PIECE = 20;
 	private final int TEMPS_JEU = 90; // en secondes
 	public static final String COUCHE_LOGIQUE = "murs";	// nom de la couche qui contient les murs de la carte
 	private final int EPSILON = 40; // tolerance pour la collision pièce - perso
@@ -41,7 +40,7 @@ public class Maze1 extends BasicGameState {
 	Random rand = new Random();
 	
 
-	public Maze1(String cheminCarte, int xTuilePerso, int yTuilePerso)
+	public MazeGame(String cheminCarte, int xTuilePerso, int yTuilePerso)
 			throws SlickException {
 		this.map = new TiledMap(cheminCarte);
 		int xPerso = xTuilePerso * map.getTileWidth();
@@ -52,11 +51,19 @@ public class Maze1 extends BasicGameState {
 	@Override
 	public void init(GameContainer arg0, StateBasedGame game)
 			throws SlickException {
-		// on adapte la taille de la fenetre à la taille de la map
-		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),
-				map.getHeight() * map.getTileHeight(), false);
 		this.niveauActuel = 1;
 		remplirLabyrinthe();
+
+	}
+
+	
+	
+	@Override
+	public void enter(GameContainer container, StateBasedGame game)
+			throws SlickException {
+		// TODO Auto-generated method stub
+		super.enter(container, game);
+		this.ajusteTailleFenetre();
 		chrono = java.lang.System.currentTimeMillis();
 		this.tempsEcoule=TEMPS_JEU;
 		audio = Audio.getSon(SON_FILE);
@@ -191,6 +198,8 @@ public class Maze1 extends BasicGameState {
 		this.niveauActuel ++;
 	}
 
+	
+
 	@Override
 	public int getID() {
 		return States.GAME;
@@ -210,6 +219,23 @@ public class Maze1 extends BasicGameState {
 	@Override
 	public void keyReleased(int key, char c) {
 		perso.setMoving(false);
+	}
+	
+	
+	
+	/*
+	 * Redimentionne la fenetre pour qu'elle s'adapte à la taille du labyrinthe
+	 */
+	private void ajusteTailleFenetre() 
+	{
+		try {
+			StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),
+					map.getHeight() * map.getTileHeight(), false);
+		} catch (SlickException e) {
+			// TODO Auto-generated catch block
+			System.out.println("impossible de redimentionner la fenetre");
+			e.printStackTrace();
+		}
 	}
 
 }

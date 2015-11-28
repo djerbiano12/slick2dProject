@@ -22,7 +22,7 @@ public class StateWin extends BasicGameState{
 			throws SlickException {
 		g.setBackground(Color.white);
 		g.setColor(Color.blue);
-		g.drawString("Jeux Fini !!!", 250, 250);
+		g.drawString("Partie terminée, vous avez gagné !", 250, 250);
 		
 	}
 
@@ -30,7 +30,6 @@ public class StateWin extends BasicGameState{
 	public void update(GameContainer arg0, StateBasedGame arg1, int arg2)
 			throws SlickException {
 		// TODO Auto-generated method stub
-		
 	}
  
 	@Override

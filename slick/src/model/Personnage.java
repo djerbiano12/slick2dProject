@@ -4,7 +4,7 @@ package model;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.tiled.TiledMap;
 
-import slick.Maze1;
+import slick.MazeGame;
 import animation.AnimationPerso;
 
 public class Personnage extends ElementJeuMobile {
@@ -18,7 +18,7 @@ public class Personnage extends ElementJeuMobile {
 	public boolean isCollision(float x, float y, TiledMap map) {
 		int tileW = map.getTileWidth(); // largeur d'une tuile 
 		int tileH = map.getTileHeight();// hauteur d'une tuile
-		int logicLayer = map.getLayerIndex(Maze1.COUCHE_LOGIQUE);
+		int logicLayer = map.getLayerIndex(MazeGame.COUCHE_LOGIQUE);
 		// haut
 		Image tile1 = map.getTileImage((int) (x + tileW * 1) / tileW, (int) (y + tileH) / tileH, logicLayer);
 		// bas

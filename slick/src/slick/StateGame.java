@@ -3,28 +3,38 @@ package slick;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
-
+/*
+ * Classe principale qui lance le jeu (fonction main) 
+ * et gère les différentes phases de jeu (cf initStatesList)
+ */
 public class StateGame extends StateBasedGame {
 	
-	public static final int WIDTH =  1280;
-	public static final int HEIGHT =  768;
+	public static final int WIDTH =  800;
+	public static final int HEIGHT =  600;
 	public static AppGameContainer container;
 
 	public StateGame() {
 		super("Mon premier jeu");
-	} // le constructeur de la classe
+	} 
 
 
-
+	/*
+	 * Cette methode permet d'ajouter des phases à notre jeu 
+	 * à l'appel de la méthode, toutes les instances sont crées
+	 */
 	@Override
 	public void initStatesList(GameContainer arg0) throws SlickException {
-		//addState(new Maze1( "map/maze1.tmx",1,1));
-		addState(new Maze1( "map/maze1.tmx",10,1));
+		addState(new StateStart());
+		addState(new MazeGame( "map/maze1.tmx",10,1));
 		addState(new StateLoss());
 		addState(new StateWin());
 	}
+	
+	
+
 	
 	public static void main(String[] args) {
 		try {
@@ -34,7 +44,7 @@ public class StateGame extends StateBasedGame {
 			container.start(); // on démarre le container
 		} catch (SlickException e) {
 			e.printStackTrace();
-		} // l'exception de base de slick !!
+		} 
 	}
 
 } // fin de classe
