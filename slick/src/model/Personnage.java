@@ -9,8 +9,8 @@ import animation.AnimationPerso;
 
 public class Personnage extends ElementJeuMobile {
 
-	public Personnage(int positionX, int positionY) {
-		super(positionX, positionY,64,64);
+	public Personnage(int positionX, int positionY, int direction) {
+		super(positionX, positionY,64,64,direction);
 		animations = AnimationPerso.getInstance();
 	}
 

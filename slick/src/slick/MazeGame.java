@@ -7,7 +7,6 @@ import java.util.Random;
 import model.Personnage;
 import model.Piece;
 
-import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -16,48 +15,52 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.tiled.TiledMap;
 
 import Son.Audio;
 import animation.OutilsAnimation;
 
 public class MazeGame extends BasicGameState {
 
-	private final int NBR_PIECE = 20;
 	private final int TEMPS_JEU = 90; // en secondes
-	public static final String COUCHE_LOGIQUE = "murs";	// nom de la couche qui contient les murs de la carte
+	public static final String COUCHE_LOGIQUE = "murs"; // nom de la couche qui
+														// contient les murs de
+														// la carte
 	private final int EPSILON = 40; // tolerance pour la collision pièce - perso
-	public static final String URL = "map/maze";
-	public static final int NOMBRE_DE_NIVEAUX = 2;
+	
 	public static final String SON_FILE = "Sons/24118.wav";
-	private TiledMap map;
+	private MaTiledMap map;
 	Personnage perso;
 	private List<Piece> pieces;
 	private long chrono = 0, chrono2;
 	private int tempsEcoule, ancienneDuree;
 	private Audio audio;
-	public int niveauActuel;
-	Random rand = new Random();
+	boolean fin;
+	GameContainer container;
+	StateBasedGame game;
+	
 	
 
-	public MazeGame(String cheminCarte, int xTuilePerso, int yTuilePerso)
+	public MazeGame(String cheminCarte)
 			throws SlickException {
-		this.map = new TiledMap(cheminCarte);
-		int xPerso = xTuilePerso * map.getTileWidth();
-		int yPerso = yTuilePerso * map.getTileHeight();
-		this.perso=new Personnage(xPerso, yPerso);	
+	
+		this.map = new MaTiledMap(cheminCarte);
+		audio = Audio.getSon(SON_FILE);
+		this.monInit();
 	}
+
+
 
 	@Override
-	public void init(GameContainer arg0, StateBasedGame game)
+	public void init(GameContainer arg0, StateBasedGame arg1)
 			throws SlickException {
-		this.niveauActuel = 1;
-		remplirLabyrinthe();
-
+		// TODO Auto-generated method stub
+		this.container=arg0;
+		this.game=arg1;
+		
 	}
 
-	
-	
+
+
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
 			throws SlickException {
@@ -65,37 +68,70 @@ public class MazeGame extends BasicGameState {
 		super.enter(container, game);
 		this.ajusteTailleFenetre();
 		chrono = java.lang.System.currentTimeMillis();
-		this.tempsEcoule=TEMPS_JEU;
-		audio = Audio.getSon(SON_FILE);
+		this.tempsEcoule = TEMPS_JEU;
 		audio.loop();
+		
+
 	}
 
 	@Override
 	public void render(GameContainer arg0, StateBasedGame game, Graphics graphic)
 			throws SlickException {
-		this.map.render(0, 0);
 		
+		
+		/* On commence par dessiner la map*/
+		if (fin)
+		{
+			/* Le joueur a terminé le niveau, on ouvre la porte et on regarde s'il atteint la porte*/
+			this.map.renderSansPorte();
+			int xPerso = (int) perso.getX() + perso.getWidth() / 2;
+			int yPerso = (int) perso.getY() + perso.getHeight() / 2;
+			if (this.map.isCollisionPorte(xPerso,yPerso))
+				this.changerNiveau();
+			
+		}
+		else 
+			 /* Le joueur n'a pas terminé le niveau, la porte reste fermee*/
+			this.map.renderAvecPorte();
+		
+		dessinePersonnage(graphic);
+		CollisionPiecePerso();
+		affichePieces(graphic);
+		chrono(graphic, game);
+		verifierGain(game);
+
+
+	}
+	
+	private void monInit(){
+		remplirLabyrinthe();
+		int xPerso = map.getxPerso();
+		int yPerso =  map.getyPerso();
+		int direction= map.getDirection();
+		this.perso = new Personnage(xPerso, yPerso,direction);
+		fin=false;
+	}
+
+
+	public void dessinePersonnage(Graphics graphic){
+		/* On dessine le personnage, slick s'occupe de charger la bonne image de l'animation*/
+		graphic.drawAnimation(perso.getAnimations()[perso.getDirection()
+				+ (perso.isMoving() ? 4 : 0)], perso.getX(), perso.getY());
+		
+		/* On dessine l'ombre du personnage*/
 		graphic.setColor(new Color(0, 0, 0, .5f));
 		graphic.fillOval(perso.getX() + 16, perso.getY() + 52, 32, 16);
-		graphic.drawAnimation(perso.getAnimations()[perso.getDirection() + (perso.isMoving() ? 4 : 0)], perso.getX(),
-				perso.getY());
-		graphic.drawRect(perso.getX(),perso.getY(), 64, 64);
 		
-		CollisionPiecePerso();
-		for (int i = 0; i < pieces.size(); i++) {
+	}
+	
+	public void affichePieces(Graphics graphic){
+		for (int i = 0; i < pieces.size(); i++)
 			pieces.get(i).dessiner(graphic);
-			
-			//////////////////////////////////////
-			///   Marquage de debug
-			//////////////////////////////////////
-			graphic.setColor(Color.red);
-			graphic.fillOval(pieces.get(i).getX() , pieces.get(i).getY() , 7, 7);
-			graphic.setColor(Color.black);
-			graphic.drawRect(pieces.get(i).getX(), pieces.get(i).getY(), 32, 32);
-		}
 		
-		
-		
+	}
+	
+	
+	public void chrono(Graphics graphic,StateBasedGame game){
 		graphic.setColor(Color.white);
 		chrono2 = java.lang.System.currentTimeMillis();
 		int duree = (int) ((chrono2 - chrono) * 0.001) - this.ancienneDuree;
@@ -106,38 +142,22 @@ public class MazeGame extends BasicGameState {
 			audio.Stop();
 			game.enterState(States.LOST);
 		}
-		verifierGain(game);	
-		//////////////////////////////////////
-		///   Marquage de debug
-		//////////////////////////////////////
-		graphic.setColor(Color.red);
-		graphic.fillOval(perso.getX(), perso.getY() , 7, 7);
-		graphic.setColor(Color.black);
-		graphic.drawRect(perso.getX(), perso.getY(), 64, 64);
 		
 	}
-
+	
 	@Override
 	public void update(GameContainer arg0, StateBasedGame game, int delta)
 			throws SlickException {
-			// on commence par calculer les coordonnees du prochain point
+		// on commence par calculer les coordonnees du prochain point
 		this.perso.update(delta, map);
-		
+
 	}
 
-	public void verifierGain(StateBasedGame game) {
+	public void verifierGain(StateBasedGame game) throws SlickException {
 		if (pieces.size() == 0) {
-			audio.Stop();
-			if(this.niveauActuel == NOMBRE_DE_NIVEAUX) game.enterState(States.WIN);
-			else{
-				try {
-				audio.loop();
-				passerNiveau(trouverNiveau(this.niveauActuel), 10, 1);
-			} catch (SlickException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-				}
+			this.fin=true;
+
+			
 		}
 	}
 
@@ -149,16 +169,14 @@ public class MazeGame extends BasicGameState {
 
 	}
 
-  public String trouverNiveau(int niveauActuel){
-	  niveauActuel++;
-	  return URL+niveauActuel+".tmx";
-  }
+
 	public void remplirLabyrinthe() {
 		pieces = new ArrayList<Piece>();
 		int posxAleatoire, posyAleatoire;
-		int tileW = map.getTileWidth(); // largeur d'une tuile 
+		int tileW = map.getTileWidth(); // largeur d'une tuile
 		int tileH = map.getTileHeight();// hauteur d'une tuile
-		for (int i = 0; i < NBR_PIECE; i++) {
+		Random rand = new Random();
+		for (int i = 0; i < map.getNombrePieces(); i++) {
 
 			/********************************************************************************
 			 * Generer aleatoirement les positions X et Y des boules a manger
@@ -166,70 +184,84 @@ public class MazeGame extends BasicGameState {
 			 * - valeurMin)
 			 ********************************************************************************/
 			do {
-				posxAleatoire = 1+rand.nextInt(this.map.getWidth()-3);
-				posyAleatoire = 1+rand.nextInt(this.map.getWidth()-3);
+				posxAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
+				posyAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
 			} while (detecterMurs(posxAleatoire, posyAleatoire));
-			pieces.add(new Piece(posxAleatoire*tileW, posyAleatoire*tileH));
+			pieces.add(new Piece(posxAleatoire * tileW, posyAleatoire * tileH));
 		}
 
 	}
 
 	public void CollisionPiecePerso() {
-		// Pour détecter une collision entre le perso et une pièce, on considère le centre des deux images
+		// Pour détecter une collision entre le perso et une pièce, on considère
+		// le centre des deux images
 		for (int i = 0; i < pieces.size(); i++) {
 			Piece piece = this.pieces.get(i);
-			int xPiece = piece.getX()+piece.getWidth()/2;
-			int yPiece = piece.getY()+piece.getHeight()/2;
-			int xPerso = (int)perso.getX() +perso.getWidth()/2;
-			int yPerso = (int)perso.getY() +perso.getHeight()/2;
+			int xPiece = piece.getX() + piece.getWidth() / 2;
+			int yPiece = piece.getY() + piece.getHeight() / 2;
+			int xPerso = (int) perso.getX() + perso.getWidth() / 2;
+			int yPerso = (int) perso.getY() + perso.getHeight() / 2;
 			// on regarde s'ils sont proche avec une tolérance epsilon
-			if (Math.abs(xPerso - xPiece)<EPSILON && Math.abs(yPerso - yPiece)<EPSILON)
+			if (Math.abs(xPerso - xPiece) < EPSILON
+					&& Math.abs(yPerso - yPiece) < EPSILON)
 				this.pieces.remove(i);
 		}
 	}
-	
-	public void passerNiveau(String cheminCarte,int X, int Y) throws SlickException{
-		this.map = new TiledMap(cheminCarte);
-		StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),map.getHeight() * map.getTileHeight(), false);
-		this.perso.setX(X * map.getTileWidth());
-		this.perso.setY(Y * map.getTileHeight());
-		remplirLabyrinthe();
-		this.tempsEcoule = TEMPS_JEU;
-		this.niveauActuel ++;
-	}
 
-	
+	void changerNiveau() {
+		audio.Stop();
+		try {
+			this.map = new MaTiledMap("map/"+this.map.getNiveauSuivant()+".tmx");
+			monInit();
+			enter(container, game);
+			
+		} catch (Exception e) {
+			// Le chargement de la prochaine carte n'a pas réussi, on arrete le jeu
+			game.enterState(States.WIN);
+		}
+		
+		
+		
+	}
 
 	@Override
 	public int getID() {
 		return States.GAME;
 	}
 
+	/* Quand on relache une touche de direction, la direction du personnage change et il se deplace*/
 	@Override
 	public void keyPressed(int key, char c) {
 		switch (key) {
-		case Input.KEY_UP: perso.setDirection( OutilsAnimation.HAUT ) ;break;
-		case Input.KEY_LEFT: perso.setDirection(  OutilsAnimation.GAUCHE);break;
-		case Input.KEY_DOWN: perso.setDirection( OutilsAnimation.BAS); break;
-		case Input.KEY_RIGHT: perso.setDirection(  OutilsAnimation.DROITE); break;
+		case Input.KEY_UP:
+			perso.setDirection(OutilsAnimation.HAUT);
+			break;
+		case Input.KEY_LEFT:
+			perso.setDirection(OutilsAnimation.GAUCHE);
+			break;
+		case Input.KEY_DOWN:
+			perso.setDirection(OutilsAnimation.BAS);
+			break;
+		case Input.KEY_RIGHT:
+			perso.setDirection(OutilsAnimation.DROITE);
+			break;
 		}
 		perso.setMoving(true);
 	}
 
+	/* Quand on relache une touche de direction, le personnage s'arrete*/
 	@Override
 	public void keyReleased(int key, char c) {
 		perso.setMoving(false);
 	}
-	
-	
-	
+
 	/*
 	 * Redimentionne la fenetre pour qu'elle s'adapte à la taille du labyrinthe
 	 */
-	private void ajusteTailleFenetre() 
-	{
+	private void ajusteTailleFenetre() {
 		try {
-			StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(),
+			StateGame.container.setDisplayMode(
+					map.getWidth() * map.getTileWidth(),
 					map.getHeight() * map.getTileHeight(), false);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
@@ -237,5 +269,8 @@ public class MazeGame extends BasicGameState {
 			e.printStackTrace();
 		}
 	}
+
+
+
 
 }

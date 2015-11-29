@@ -28,7 +28,7 @@ public class StateGame extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer arg0) throws SlickException {
 		addState(new StateStart());
-		addState(new MazeGame( "map/maze1.tmx",10,1));
+		addState(new MazeGame("map/maze1.tmx"));
 		addState(new StateLoss());
 		addState(new StateWin());
 	}

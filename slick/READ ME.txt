@@ -1,0 +1,4 @@
+Pour utiliser les propriétés de la carte et donc les triggers, 
+il faut obligatoirement une version plus ancienne de TILED pour enregistrer les cartes
+
+Elle est téléchargeable à cette adresse : http://sourceforge.net/projects/tiled/

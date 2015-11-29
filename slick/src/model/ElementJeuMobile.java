@@ -11,9 +11,9 @@ public abstract class ElementJeuMobile extends ElementJeu {
 	private boolean moving;
 	protected Animation[] animations;
 	
-	public ElementJeuMobile(int positionX, int positionY, int width, int height) {
+	public ElementJeuMobile(int positionX, int positionY, int width, int height, int direction) {
 		super(positionX, positionY, width, height);
-		setDirection(OutilsAnimation.BAS);
+		this.direction = direction;
 		setMoving(false);
 	}
 
