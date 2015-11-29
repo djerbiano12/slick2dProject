@@ -30,18 +30,11 @@ public final class OutilsAnimation {
     }
 
     private static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y) {
-<<<<<<< HEAD
         final int ANIMATION_DURATION_MS = 100;
         Animation animation             = new Animation();
 
         for (int x = startX; x < endX; x++) {
             animation.addFrame(spriteSheet.getSprite(x, y), ANIMATION_DURATION_MS);
-=======
-        Animation animation = new Animation();
-
-        for (int x = startX; x < endX; x++) {
-            animation.addFrame(spriteSheet.getSprite(x, y), 100);
->>>>>>> 3cfdf61fee1eaa3f0c3325624f0482b0d2827c85
         }
 
         return animation;
