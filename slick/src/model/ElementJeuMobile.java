@@ -20,10 +20,6 @@ public abstract class ElementJeuMobile extends ElementJeu {
         return animations;
     }
 
-    public void setAnimations(Animation[] animations) {
-        this.animations = animations;
-    }
-
     public int getDirection() {
         return direction;
     }

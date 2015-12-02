@@ -4,7 +4,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.SoundStore;
 
 public class Audio extends Thread {
-
     private org.newdawn.slick.openal.Audio sound;
     private static Audio melodie = null;
 
@@ -39,7 +38,6 @@ public class Audio extends Thread {
             throw new SlickException("Failed to load sound: " + ref);
         }
     }
-
 
     public void play() {
         play(1.0f, 1.0f);

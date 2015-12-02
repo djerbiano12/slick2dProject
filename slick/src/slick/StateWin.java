@@ -9,19 +9,19 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class StateWin extends BasicGameState{
 	@Override
-	public void init(GameContainer arg0, StateBasedGame arg1) throws SlickException {
+	public void init(GameContainer gameContainer, StateBasedGame game) throws SlickException {
         //
 	}
 
 	@Override
-	public void render(GameContainer arg0, StateBasedGame arg1, Graphics g) throws SlickException {
+	public void render(GameContainer gameContainer, StateBasedGame game, Graphics g) throws SlickException {
 		g.setBackground(Color.white);
 		g.setColor(Color.blue);
 		g.drawString("Partie terminée, vous avez gagné !", 250, 250);
 	}
 
 	@Override
-	public void update(GameContainer arg0, StateBasedGame arg1, int arg2) throws SlickException {
+	public void update(GameContainer gameContainer, StateBasedGame game, int arg2) throws SlickException {
         //
     }
  

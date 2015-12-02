@@ -10,7 +10,6 @@ import model.Piece;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
@@ -22,14 +21,13 @@ import animation.OutilsAnimation;
 public class MazeGame extends BasicGameState {
     private final       int    TEMPS_JEU      = 90; // en secondes
     public static final String COUCHE_LOGIQUE = "murs"; // nom de la couche qui contient les murs de la carte
-    private final       int    EPSILON        = 40; // tolerance pour la collision pièce - perso
     public static final String SON_FILE       = "Sons/24118.wav";
     private MaTiledMap  map;
     private Personnage  perso;
     private List<Piece> pieces;
     private float       tempsRestant; // en secondes
     private Audio       audio;
-    boolean        fin; // si le joueur a récolté  toutes les pi�ces
+    boolean        fin; // si le joueur a récolté  toutes les pièces
     GameContainer  container;
     StateBasedGame game;
 
@@ -39,10 +37,10 @@ public class MazeGame extends BasicGameState {
     }
 
     @Override
-    public void init(GameContainer arg0, StateBasedGame arg1)
-    throws SlickException {
-        this.container = arg0;
-        this.game = arg1;
+    public void init(GameContainer gameContainer, StateBasedGame game) throws SlickException {
+        this.container = gameContainer;
+        this.game = game;
+
         remplirLabyrinthe();
     }
 
@@ -73,7 +71,7 @@ public class MazeGame extends BasicGameState {
      * Fonction d'affichage qui s'execute à chaque boucle de jeu
      */
     @Override
-    public void render(GameContainer arg0, StateBasedGame game, Graphics graphic)
+    public void render(GameContainer gameContainer, StateBasedGame game, Graphics graphic)
     throws SlickException {
         // On commence par dessiner la map
         if (fin) {
@@ -86,15 +84,15 @@ public class MazeGame extends BasicGameState {
 
         afficherPersonnage(graphic);
         afficherPieces(graphic);
-        afficherChrono(graphic, game);
+        afficherChrono(graphic);
     }
 
     /**
-     * La fonction update sert à  mettre à jour les données
+     * La fonction update sert à mettre à jour les données
      * Ici on n'a pas de données donc il n'y a rien à faire
      */
     @Override
-    public void update(GameContainer arg0, StateBasedGame game, int delta)
+    public void update(GameContainer gameContainer, StateBasedGame game, int delta)
     throws SlickException {
         this.updateChrono(delta);
         this.perso.update(delta, map);
@@ -113,15 +111,15 @@ public class MazeGame extends BasicGameState {
             CollisionPiecePerso();
         }
 
-        verifierGain(game);
+        verifierGain();
     }
 
     /**
      * Détecte si le personnage passe par la porte pour passer au niveau suivant
      */
     private boolean collisionPortePerso() {
-        int xPerso = (int) perso.getX() + perso.getWidth() / 2;
-        int yPerso = (int) perso.getY() + perso.getHeight() / 2;
+        int xPerso = perso.getX() + perso.getWidth() / 2;
+        int yPerso = perso.getY() + perso.getHeight() / 2;
         return (this.map.isCollisionPorte(xPerso, yPerso));
     }
 
@@ -150,7 +148,7 @@ public class MazeGame extends BasicGameState {
     /**
      * Affiche le chronomètre
      */
-    public void afficherChrono(Graphics graphic, StateBasedGame game) {
+    public void afficherChrono(Graphics graphic) {
         graphic.setColor(Color.white);
         graphic.drawString("Temps restant = " + (int) this.tempsRestant, 30, 40);
     }
@@ -160,6 +158,7 @@ public class MazeGame extends BasicGameState {
      */
     public void updateChrono(int delta) {
         this.tempsRestant = (float) (tempsRestant - delta * 0.001);
+
         if (this.tempsRestant <= 0) {
             audio.Stop();
             game.enterState(States.LOST);
@@ -169,7 +168,7 @@ public class MazeGame extends BasicGameState {
     /**
      * Vérifie si le joueur a ramassé toutes les pièces
      */
-    public void verifierGain(StateBasedGame game) throws SlickException {
+    public void verifierGain() throws SlickException {
         if (pieces.size() == 0) {
             this.fin = true;
         }
@@ -180,7 +179,7 @@ public class MazeGame extends BasicGameState {
      * Le nombre de pièces est a déterminer dans les propriétés de la carte
      */
     public void remplirLabyrinthe() {
-        pieces = new ArrayList<Piece>();
+        pieces = new ArrayList<>();
         int    posxAleatoire, posyAleatoire;
         int    tileW = map.getTileWidth(); // largeur d'une tuile
         int    tileH = map.getTileHeight();// hauteur d'une tuile
@@ -206,13 +205,15 @@ public class MazeGame extends BasicGameState {
      * Detecte s'il y a une collision entre le personnage et une pièce
      */
     public void CollisionPiecePerso() {
+        final int EPSILON = 40; // tolerance pour la collision pièce - perso
+
         // Pour détecter une collision entre le perso et une pièce, on considère le centre des deux images
         for (int i = 0; i < pieces.size(); i++) {
             Piece piece  = this.pieces.get(i);
             int   xPiece = piece.getX() + piece.getWidth() / 2;
             int   yPiece = piece.getY() + piece.getHeight() / 2;
-            int   xPerso = (int) perso.getX() + perso.getWidth() / 2;
-            int   yPerso = (int) perso.getY() + perso.getHeight() / 2;
+            int   xPerso = perso.getX() + perso.getWidth() / 2;
+            int   yPerso = perso.getY() + perso.getHeight() / 2;
 
             // on regarde s'ils sont proche avec une tolérance epsilon
             if (Math.abs(xPerso - xPiece) < EPSILON && Math.abs(yPerso - yPiece) < EPSILON) {
@@ -286,9 +287,7 @@ public class MazeGame extends BasicGameState {
      */
     private void ajusteTailleFenetre() {
         try {
-            StateGame.container.setDisplayMode(
-                    map.getWidth() * map.getTileWidth(),
-                    map.getHeight() * map.getTileHeight(), false);
+            StateGame.container.setDisplayMode(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight(), false);
         } catch (SlickException e) {
             System.out.println("impossible de redimensionner la fenêtre");
             e.printStackTrace();

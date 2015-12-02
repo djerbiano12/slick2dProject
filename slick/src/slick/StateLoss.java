@@ -9,12 +9,12 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class StateLoss extends BasicGameState {
     @Override
-    public void init(GameContainer arg0, StateBasedGame arg1) throws SlickException {
+    public void init(GameContainer gameContainer, StateBasedGame game) throws SlickException {
         //
     }
 
     @Override
-    public void render(GameContainer arg0, StateBasedGame arg1, Graphics g) throws SlickException {
+    public void render(GameContainer gameContainer, StateBasedGame game, Graphics g) throws SlickException {
         g.setBackground(Color.white);
         g.setColor(Color.blue);
         g.drawString("Temps écoulé, vous avez perdu !!!", 250, 250);

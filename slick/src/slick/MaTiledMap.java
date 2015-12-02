@@ -34,6 +34,7 @@ public class MaTiledMap extends TiledMap {
                     xPerso = getObjectX(0, objectID);
                     yPerso = getObjectY(0, objectID);
                     String dir = getObjectProperty(0, objectID, "direction", "bas").toLowerCase();
+
                     switch (dir) {
                         case "haut":
                             this.direction = OutilsAnimation.HAUT;
@@ -110,9 +111,7 @@ public class MaTiledMap extends TiledMap {
      */
     public boolean isMur(int x, int y) {
         int   logicLayer = getLayerIndex("murs");
-        Image tile1      = null;
-        tile1 = getTileImage(x, y, logicLayer);
+        Image tile1      = getTileImage(x, y, logicLayer);
         return (tile1 != null);
-
     }
 }
