@@ -95,10 +95,8 @@ public class MazeGame extends BasicGameState {
 			this.map.renderAvecPorte();
 		
 		dessinePersonnage(graphic);
-		CollisionPiecePerso();
 		affichePieces(graphic);
-		chrono(graphic, game);
-		verifierGain(game);
+		afficherChrono(graphic, game);
 
 
 	}
@@ -131,7 +129,7 @@ public class MazeGame extends BasicGameState {
 	}
 	
 	
-	public void chrono(Graphics graphic,StateBasedGame game){
+	public void afficherChrono(Graphics graphic,StateBasedGame game){
 		graphic.setColor(Color.white);
 		chrono2 = java.lang.System.currentTimeMillis();
 		int duree = (int) ((chrono2 - chrono) * 0.001) - this.ancienneDuree;
@@ -148,6 +146,8 @@ public class MazeGame extends BasicGameState {
 	@Override
 	public void update(GameContainer arg0, StateBasedGame game, int delta)
 			throws SlickException {
+		CollisionPiecePerso();
+		verifierGain(game);
 		// on commence par calculer les coordonnees du prochain point
 		this.perso.update(delta, map);
 
