@@ -3,7 +3,7 @@ package model;
 abstract class ElementJeu {
 
 	
-	protected int positionX,positionY; //positions de l'element en pixels
+	protected int positionX,positionY; //positions de l'élément en pixels
 	protected int width,height;
 	
 

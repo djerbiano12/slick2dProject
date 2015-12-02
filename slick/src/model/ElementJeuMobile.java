@@ -14,7 +14,7 @@ public abstract class ElementJeuMobile extends ElementJeu {
 	public ElementJeuMobile(int positionX, int positionY, int width, int height, int direction) {
 		super(positionX, positionY, width, height);
 		this.direction = direction;
-		setMoving(false);
+		this.moving=false;
 	}
 
 	

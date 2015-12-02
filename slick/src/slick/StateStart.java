@@ -20,7 +20,7 @@ public class StateStart extends BasicGameState {
 	}
 
 	/**
-	 * Fonction d'affichage qui s'execute à chaque boucle de jeu
+	 * Fonction d'affichage qui s'execute Ã  chaque boucle de jeu
 	 */
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
@@ -30,8 +30,8 @@ public class StateStart extends BasicGameState {
 	}
 
 	/**
-	 * La fonction update sert à mettre à jour les données 
-	 * Ici on n'a pas de données donc il n'y a rien à faire
+	 * La fonction update sert Ã   mettre Ã  jour les donnÃ©es 
+	 * Ici on n'a pas de donnÃ©es donc il n'y a rien Ã  faire
 	 */
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
@@ -46,8 +46,8 @@ public class StateStart extends BasicGameState {
 	}
 
 	/**
-	 * L'identifiant permet d'identifier les différentes boucles. Pour passer de
-	 * l'une à l'autre.
+	 * L'identifiant permet d'identifier les diffÃ©rentes boucles. Pour passer de
+	 * l'une Ã  l'autre.
 	 */
 
 	@Override

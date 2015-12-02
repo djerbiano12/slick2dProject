@@ -14,7 +14,9 @@ public class Personnage extends ElementJeuMobile {
 		animations = AnimationPerso.getInstance();
 	}
 
-	
+	/*
+	 * Detecte une collision entre le personnage et un mur
+	 */
 	public boolean isCollision(float x, float y, TiledMap map) {
 		int tileW = map.getTileWidth(); // largeur d'une tuile 
 		int tileH = map.getTileHeight();// hauteur d'une tuile

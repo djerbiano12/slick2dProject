@@ -22,7 +22,7 @@ public class StateLoss extends BasicGameState{
 			throws SlickException {
 		g.setBackground(Color.white);
 		g.setColor(Color.blue);
-		g.drawString("Temps écoulé, vous avez perdu !!!", 250, 250);
+		g.drawString("Temps Ã©coulÃ©, vous avez perdu !!!", 250, 250);
 		
 	}
 

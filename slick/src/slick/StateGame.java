@@ -8,7 +8,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 /*
  * Classe principale qui lance le jeu (fonction main) 
- * et gère les différentes phases de jeu (cf initStatesList)
+ * et gï¿½re les diffï¿½rentes phases de jeu (cf initStatesList)
  */
 public class StateGame extends StateBasedGame {
 	
@@ -22,8 +22,8 @@ public class StateGame extends StateBasedGame {
 
 
 	/*
-	 * Cette methode permet d'ajouter des phases à notre jeu 
-	 * à l'appel de la méthode, toutes les instances sont crées
+	 * Cette methode permet d'ajouter des phases Ã  notre jeu 
+	 * ï¿½ l'appel de la mÃ©thode, toutes les instances sont crÃ©es
 	 */
 	@Override
 	public void initStatesList(GameContainer arg0) throws SlickException {
@@ -40,8 +40,8 @@ public class StateGame extends StateBasedGame {
 		try {
 			
 			container = new AppGameContainer(new StateGame());
-			container.setTargetFrameRate(60); // on règle le FrameRate
-			container.start(); // on démarre le container
+			container.setTargetFrameRate(60); // on rÃ¨gle le FrameRate
+			container.start(); // on dÃ©marre le container
 		} catch (SlickException e) {
 			e.printStackTrace();
 		} 

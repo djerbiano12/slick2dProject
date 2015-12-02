@@ -1,6 +1,7 @@
 package slick;
 
 
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -9,10 +10,10 @@ import animation.OutilsAnimation;
 public class MaTiledMap extends TiledMap {
 
 	private static final int EPSILON = 50;
-	private int nombrePieces;
-	private int xPerso,yPerso,direction;
-	private int xPorte, yPorte;
-	String niveauSuivant;
+	private int nombrePieces; /* nombre de pièces à placer dans le labyrinthe*/
+	private int xPerso,yPerso,direction;  /* paramètres du personnage*/
+	private int xPorte, yPorte; /* paramètres de la porte*/
+	String niveauSuivant; /* nom du fichier qui contient la prochaine carte*/
 	
 	public MaTiledMap(String cheminCarte) throws SlickException {
 		super(cheminCarte);
@@ -72,28 +73,47 @@ public class MaTiledMap extends TiledMap {
 		return niveauSuivant;
 	}
 
-
+	/* 
+	 * Affiche la carte sans la porte
+	 */
 	public void renderSansPorte(){
 		this.render(0, 0,this.getLayerIndex("fond"));
 		this.render(0, 0,this.getLayerIndex("murs"));
 	}
 	
-	
+	/* 
+	 * Affiche la porte
+	 */
 	public void renderPorte(){
 		this.render(0, 0,this.getLayerIndex("porte"));
 	}
 	
+	/* 
+	 * Affiche la carte avec la porte
+	 */
 	public void renderAvecPorte(){
 		this.renderSansPorte();
 		this.renderPorte();
 	}
 	
 	/* 
-	 * detecte une collision avec une tol�rance epsilon
+	 * detecte une collision avec une tolérance epsilon
 	 */
 	public boolean isCollisionPorte (int xPerso, int yPerso){
 		return (Math.abs(xPerso - xPorte) < EPSILON
 				&& Math.abs(yPerso - yPorte) < EPSILON);
 			
+	}
+	
+	/*
+	 * Detecte s'il y a un mur aux coordonées x,y
+	 * x et y sont des entiers et correspondent aux tuiles de la carte
+	 */
+	public boolean isMur(int x, int y) {
+		int logicLayer = getLayerIndex("murs");
+		Image tile1 = null;
+		tile1 = getTileImage(x, y, logicLayer);
+		return (tile1 != null);
+
 	}
 }

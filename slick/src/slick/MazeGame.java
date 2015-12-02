@@ -25,16 +25,15 @@ public class MazeGame extends BasicGameState {
 	public static final String COUCHE_LOGIQUE = "murs"; // nom de la couche qui
 														// contient les murs de
 														// la carte
-	private final int EPSILON = 40; // tolerance pour la collision pi�ce - perso
+	private final int EPSILON = 40; // tolerance pour la collision pi�ce - perso
 	
 	public static final String SON_FILE = "Sons/24118.wav";
 	private MaTiledMap map;
 	Personnage perso;
 	private List<Piece> pieces;
-	private long chrono = 0, chrono2;
-	private int tempsEcoule, ancienneDuree;
+	private float tempsRestant; // en secondes
 	private Audio audio;
-	boolean fin;
+	boolean fin; // si le joueur a récolté  toutes les pi�ces
 	GameContainer container;
 	StateBasedGame game;
 	
@@ -42,10 +41,8 @@ public class MazeGame extends BasicGameState {
 
 	public MazeGame(String cheminCarte)
 			throws SlickException {
-	
-		this.map = new MaTiledMap(cheminCarte);
+		initNiveau(cheminCarte);
 		audio = Audio.getSon(SON_FILE);
-		this.monInit();
 	}
 
 
@@ -56,10 +53,22 @@ public class MazeGame extends BasicGameState {
 		// TODO Auto-generated method stub
 		this.container=arg0;
 		this.game=arg1;
+		remplirLabyrinthe();
 		
 	}
 
-
+	/* 
+	 * Cette fonction est appelée a chaque changement de niveau
+	 */
+	public void initNiveau(String cheminCarte) throws SlickException{
+		this.map = new MaTiledMap(cheminCarte);
+		int xPerso = map.getxPerso();
+		int yPerso =  map.getyPerso();
+		int direction= map.getDirection();
+		this.perso = new Personnage(xPerso, yPerso,direction);
+		fin=false;
+		
+	}
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
@@ -67,13 +76,15 @@ public class MazeGame extends BasicGameState {
 		// TODO Auto-generated method stub
 		super.enter(container, game);
 		this.ajusteTailleFenetre();
-		chrono = java.lang.System.currentTimeMillis();
-		this.tempsEcoule = TEMPS_JEU;
+		this.tempsRestant = TEMPS_JEU;
 		audio.loop();
 		
 
 	}
 
+	/**
+	 * Fonction d'affichage qui s'execute à chaque boucle de jeu
+	 */
 	@Override
 	public void render(GameContainer arg0, StateBasedGame game, Graphics graphic)
 			throws SlickException {
@@ -82,36 +93,68 @@ public class MazeGame extends BasicGameState {
 		/* On commence par dessiner la map*/
 		if (fin)
 		{
-			/* Le joueur a termin� le niveau, on ouvre la porte et on regarde s'il atteint la porte*/
+			/* Le joueur a terminé le niveau, on ouvre la porte et on regarde s'il atteint la porte*/
 			this.map.renderSansPorte();
-			int xPerso = (int) perso.getX() + perso.getWidth() / 2;
-			int yPerso = (int) perso.getY() + perso.getHeight() / 2;
-			if (this.map.isCollisionPorte(xPerso,yPerso))
-				this.changerNiveau();
+
 			
 		}
 		else 
-			 /* Le joueur n'a pas termin� le niveau, la porte reste fermee*/
+			 /* Le joueur n'a pas terminé le niveau, la porte reste fermée*/
 			this.map.renderAvecPorte();
 		
-		dessinePersonnage(graphic);
-		affichePieces(graphic);
+		afficherPersonnage(graphic);
+		afficherPieces(graphic);
 		afficherChrono(graphic, game);
 
 
+	}	
+	
+	/**
+	 * La fonction update sert à  mettre à jour les données 
+	 * Ici on n'a pas de données donc il n'y a rien à faire
+	 */
+	@Override
+	public void update(GameContainer arg0, StateBasedGame game, int delta)
+			throws SlickException {
+		this.updateChrono(delta);
+		this.perso.update(delta, map);	
+		if(fin)
+		{
+			/* 
+			 * si le joueur a ramass� toutes les pièces, on verifie s'il sort du niveau
+			 * S'il sort on passe au niveau suivant
+			*/
+			if (collisionPortePerso())
+				this.changerNiveau();
+		}
+		else
+		{
+			/* 
+			 * si le joueur a n'a pas ramassé toutes les pièces, on gère la collision avec les pièces
+			*/
+			CollisionPiecePerso();		
+		}
+
+		verifierGain(game);
+		
+
 	}
 	
-	private void monInit(){
-		remplirLabyrinthe();
-		int xPerso = map.getxPerso();
-		int yPerso =  map.getyPerso();
-		int direction= map.getDirection();
-		this.perso = new Personnage(xPerso, yPerso,direction);
-		fin=false;
+	/*
+	 * Détecte si le personnage passe par la porte pour passer au niveau suivant
+	 */
+	private boolean collisionPortePerso()
+	{
+		int xPerso = (int) perso.getX() + perso.getWidth() / 2;
+		int yPerso = (int) perso.getY() + perso.getHeight() / 2;
+		return (this.map.isCollisionPorte(xPerso,yPerso));
 	}
 
 
-	public void dessinePersonnage(Graphics graphic){
+	/*
+	 * Affiche le personnage
+	 */
+	public void afficherPersonnage(Graphics graphic){
 		/* On dessine le personnage, slick s'occupe de charger la bonne image de l'animation*/
 		graphic.drawAnimation(perso.getAnimations()[perso.getDirection()
 				+ (perso.isMoving() ? 4 : 0)], perso.getX(), perso.getY());
@@ -122,54 +165,54 @@ public class MazeGame extends BasicGameState {
 		
 	}
 	
-	public void affichePieces(Graphics graphic){
+	/*
+	 * Affiche toutes les pièces
+	 */
+	public void afficherPieces(Graphics graphic){
 		for (int i = 0; i < pieces.size(); i++)
 			pieces.get(i).dessiner(graphic);
 		
 	}
 	
-	
+	/*
+	 * Affiche le chronomètre
+	 */
 	public void afficherChrono(Graphics graphic,StateBasedGame game){
 		graphic.setColor(Color.white);
-		chrono2 = java.lang.System.currentTimeMillis();
-		int duree = (int) ((chrono2 - chrono) * 0.001) - this.ancienneDuree;
-		this.tempsEcoule = this.tempsEcoule - duree;
-		graphic.drawString("Time = " + this.tempsEcoule, 30, 40);
-		this.ancienneDuree = (int) ((chrono2 - chrono) * 0.001);
-		if (this.tempsEcoule == 0) {
+		graphic.drawString("Temps restant = " + (int)this.tempsRestant, 30, 40);	
+		
+	}
+	
+	/*
+	 * Modifie le chronomètre
+	 */
+	public void updateChrono(int delta){
+		this.tempsRestant =   (float) (tempsRestant - delta*0.001);
+		if (this.tempsRestant <= 0) 
+		{
 			audio.Stop();
 			game.enterState(States.LOST);
 		}
 		
 	}
 	
-	@Override
-	public void update(GameContainer arg0, StateBasedGame game, int delta)
-			throws SlickException {
-		CollisionPiecePerso();
-		verifierGain(game);
-		// on commence par calculer les coordonnees du prochain point
-		this.perso.update(delta, map);
 
-	}
-
+	/*
+	 * Vérifie si le joueur a ramassé toutes les pièces
+	 */
 	public void verifierGain(StateBasedGame game) throws SlickException {
 		if (pieces.size() == 0) {
 			this.fin=true;
-
-			
 		}
 	}
 
-	private boolean detecterMurs(int x, int y) {
-		int logicLayer = this.map.getLayerIndex("murs");
-		Image tile1 = null;
-		tile1 = this.map.getTileImage(x, y, logicLayer);
-		return (tile1 != null);
-
-	}
 
 
+
+	/*
+	 * Place aléatoirement des pièces dans le labyrinthe
+	 * Le nombre de pièces est a déterminer dans les propriétés de la carte
+	 */
 	public void remplirLabyrinthe() {
 		pieces = new ArrayList<Piece>();
 		int posxAleatoire, posyAleatoire;
@@ -186,77 +229,94 @@ public class MazeGame extends BasicGameState {
 			do {
 				posxAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
 				posyAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
-			} while (detecterMurs(posxAleatoire, posyAleatoire));
+			} while (map.isMur(posxAleatoire, posyAleatoire));
 			pieces.add(new Piece(posxAleatoire * tileW, posyAleatoire * tileH));
 		}
 
 	}
 
+	/*
+	 * Detecte s'il y a une collision entre le personnage et une pièce
+	 */
 	public void CollisionPiecePerso() {
-		// Pour d�tecter une collision entre le perso et une pi�ce, on consid�re
-		// le centre des deux images
+		// Pour détecter une collision entre le perso et une pièce, on considère le centre des deux images
 		for (int i = 0; i < pieces.size(); i++) {
 			Piece piece = this.pieces.get(i);
 			int xPiece = piece.getX() + piece.getWidth() / 2;
 			int yPiece = piece.getY() + piece.getHeight() / 2;
 			int xPerso = (int) perso.getX() + perso.getWidth() / 2;
 			int yPerso = (int) perso.getY() + perso.getHeight() / 2;
-			// on regarde s'ils sont proche avec une tol�rance epsilon
+			// on regarde s'ils sont proche avec une tol�rance epsilon
 			if (Math.abs(xPerso - xPiece) < EPSILON
 					&& Math.abs(yPerso - yPiece) < EPSILON)
 				this.pieces.remove(i);
 		}
 	}
 
+	/*
+	 * Appelé quand on veut changer de niveau
+	 * La fonction cherche elle même la prochaine carte a charger
+	 */
 	void changerNiveau() {
 		audio.Stop();
 		try {
-			this.map = new MaTiledMap("map/"+this.map.getNiveauSuivant()+".tmx");
-			monInit();
+			initNiveau("map/"+this.map.getNiveauSuivant()+".tmx");
 			enter(container, game);
 			
 		} catch (Exception e) {
-			// Le chargement de la prochaine carte n'a pas r�ussi, on arrete le jeu
+			// Le chargement de la prochaine carte n'a pas réussi, on arrete le jeu
 			game.enterState(States.WIN);
 		}
 		
 		
 		
 	}
-
+	
+	
+	/**
+	 * L'identifiant permet d'identifier les différentes boucles. Pour passer de
+	 * l'une à l'autre.
+	 */
 	@Override
 	public int getID() {
 		return States.GAME;
 	}
 
-	/* Quand on relache une touche de direction, la direction du personnage change et il se deplace*/
+	/* 
+	 * Quand on relache une touche de direction, la direction du personnage change et il se deplace
+	 */
 	@Override
 	public void keyPressed(int key, char c) {
-		switch (key) {
-		case Input.KEY_UP:
-			perso.setDirection(OutilsAnimation.HAUT);
-			break;
-		case Input.KEY_LEFT:
-			perso.setDirection(OutilsAnimation.GAUCHE);
-			break;
-		case Input.KEY_DOWN:
-			perso.setDirection(OutilsAnimation.BAS);
-			break;
-		case Input.KEY_RIGHT:
-			perso.setDirection(OutilsAnimation.DROITE);
-			break;
+		if(tempsRestant!=TEMPS_JEU) // si le jeu a deja commencé
+		{
+			switch (key) {
+			case Input.KEY_UP:
+				perso.setDirection(OutilsAnimation.HAUT);
+				break;
+			case Input.KEY_LEFT:
+				perso.setDirection(OutilsAnimation.GAUCHE);
+				break;
+			case Input.KEY_DOWN:
+				perso.setDirection(OutilsAnimation.BAS);
+				break;
+			case Input.KEY_RIGHT:
+				perso.setDirection(OutilsAnimation.DROITE);
+				break;
+			}
+			perso.setMoving(true);
 		}
-		perso.setMoving(true);
 	}
 
-	/* Quand on relache une touche de direction, le personnage s'arrete*/
+	/* 
+	 * Quand on relache une touche de direction, le personnage s'arrete
+	 */
 	@Override
 	public void keyReleased(int key, char c) {
 		perso.setMoving(false);
 	}
 
 	/*
-	 * Redimentionne la fenetre pour qu'elle s'adapte � la taille du labyrinthe
+	 * Redimentionne la fenetre pour qu'elle s'adapte à la taille du labyrinthe
 	 */
 	private void ajusteTailleFenetre() {
 		try {

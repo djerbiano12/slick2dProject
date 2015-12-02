@@ -9,9 +9,8 @@ public class Piece extends ElementJeuStatique{
 	public Piece(int positionX, int positionY) {
 		super(positionX, positionY,32,32, Piece.IMAGE_PIECE);
 	}
-	//////////////////////////
-	/// Mettre dans la vue 
-	/////////////////////////
+
+
 	public void dessiner(Graphics g){
 	g.drawImage(image, this.positionX, this.positionY);
 	}

@@ -1,5 +1,7 @@
 package model;
 
+import java.io.IOException;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -11,11 +13,12 @@ abstract class ElementJeuStatique extends ElementJeu {
 		super(positionX,positionY, width, height);
 		try {
 			image= new Image(cheminImage,new Color(255,255,255));
-		} catch (SlickException e) {
+		} catch (SlickException e ) {
 			// TODO Auto-generated catch block
 			System.out.println("Erreur lors du chargement de l'image de la pièce");
 			e.printStackTrace();
 		}
+
 	}
 
 }

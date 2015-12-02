@@ -10,9 +10,8 @@ public class AnimationPerso {
     private static final int TUILE_LARGEUR          = 64;
     private static final int TUILE_HAUTEUR          = 64;
 
-    public AnimationPerso() throws SlickException {
+    private AnimationPerso() throws SlickException {
         super();
-
         animation = OutilsAnimation.initAnimation(NOMBRE_ETATS_ANIMATION, "map/tuiles/perso.png", TUILE_LARGEUR, TUILE_HAUTEUR);
     }
 
