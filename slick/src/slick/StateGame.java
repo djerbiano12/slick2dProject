@@ -10,6 +10,13 @@ import org.newdawn.slick.state.StateBasedGame;
  * et gÃ¨re les diffÃ©rentes phases de jeu (cf initStatesList)
  */
 public class StateGame extends StateBasedGame {
+	
+	/*
+	 * TODO implémenter:
+	 * Petite modification à faire pour démarrer le jeu
+	 * 
+	 */
+	
     public static AppGameContainer container;
 
     public StateGame() {
@@ -22,7 +29,7 @@ public class StateGame extends StateBasedGame {
      */
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
-        addState(new StateStart());
+        //addState(new StateStart());
         addState(new MazeGame("map/maze1.tmx"));
         addState(new StateLoss());
         addState(new StateWin());

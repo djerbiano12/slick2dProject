@@ -7,6 +7,7 @@ import java.util.Random;
 import model.Personnage;
 import model.Piece;
 
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -30,6 +31,7 @@ public class MazeGame extends BasicGameState {
     boolean        fin; // si le joueur a récolté  toutes les pièces
     GameContainer  container;
     StateBasedGame game;
+    Animation animation;
 
     public MazeGame(String cheminCarte) throws SlickException {
         initNiveau(cheminCarte);
@@ -71,20 +73,8 @@ public class MazeGame extends BasicGameState {
      * Fonction d'affichage qui s'execute à chaque boucle de jeu
      */
     @Override
-    public void render(GameContainer gameContainer, StateBasedGame game, Graphics graphic)
-    throws SlickException {
-        // On commence par dessiner la map
-        if (fin) {
-            // Le joueur a terminé le niveau, on ouvre la porte et on regarde s'il atteint la porte
-            this.map.renderSansPorte();
-        } else {
-            // Le joueur n'a pas terminé le niveau, la porte reste fermée
-            this.map.renderAvecPorte();
-        }
-
-        afficherPersonnage(graphic);
-        afficherPieces(graphic);
-        afficherChrono(graphic);
+    public void render(GameContainer gameContainer, StateBasedGame game, Graphics graphic){
+       graphic.drawAnimation(animation, 0, 0);
     }
 
     /**
@@ -187,17 +177,30 @@ public class MazeGame extends BasicGameState {
 
         for (int i = 0; i < map.getNombrePieces(); i++) {
 
+
+			/*
+			 * Ici on essaye de calculer des positions pour toutes les pièces On
+			 * calcule aléatoirement la position X et Y pour une pièce formule
+			 * utilisee -> int valeur = valeurMin + r.nextInt(valeurMax -
+			 * valeurMin) Si la case est libre (pas de pierre),utiliser la
+			 * fonction de la classe MaTiledMap On crée la pièce et on l'ajoute
+			 * dans le tableau des pièces Sinon On regénére X et Y (utiliser do
+			 * While)
+			 */
+			// TODO Implémenter
+        	
+        	
             /********************************************************************************
              * Generer aleatoirement les positions X et Y des boules a manger
              * formule utilisee -> int valeur = valeurMin + r.nextInt(valeurMax
              * - valeurMin)
              ********************************************************************************/
-            do {
+           /* do {
                 posxAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
                 posyAleatoire = 1 + rand.nextInt(this.map.getWidth() - 3);
             } while (map.isMur(posxAleatoire, posyAleatoire));
 
-            pieces.add(new Piece(posxAleatoire * tileW, posyAleatoire * tileH));
+            pieces.add(new Piece(posxAleatoire * tileW, posyAleatoire * tileH));*/
         }
     }
 

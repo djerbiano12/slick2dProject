@@ -110,8 +110,20 @@ public class MaTiledMap extends TiledMap {
      * x et y sont des entiers et correspondent aux tuiles de la carte
      */
     public boolean isMur(int x, int y) {
-        int   logicLayer = getLayerIndex("murs");
+    	// TODO Implémenter
+		/*
+		 * Aides:
+		 * 
+		 *  La map contient la méthode: 
+		 *  Image getTileImage(x, y,indiceCouche)
+		 * qui retourne l'image à la position (x,y) de la couche indiquée (null sinon) 
+		 * 
+		 * et la méthode:
+		 * int getLayerIndex(String couche) qui retourne l'indice de la couche passée en paramètre
+		 */
+    	
+        /*int   logicLayer = getLayerIndex("murs");
         Image tile1      = getTileImage(x, y, logicLayer);
-        return (tile1 != null);
+        return (tile1 != null);*/
     }
 }
